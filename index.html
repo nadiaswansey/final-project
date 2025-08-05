@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Oréal Routine Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', Arial, sans-serif;
+            background: linear-gradient(135deg, #fafafa 0%, #ffffff 50%, #f8f8f8 100%);
+            color: #2c2c2c;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #e31e24;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: #2c2c2c;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #666666;
+            letter-spacing: 0.05em;
+        }
+
+        .main-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .products-section {
+            flex: 2;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #e31e24;
+            box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.1);
+        }
+
+        .category-filter {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .category-filter:focus {
+            outline: none;
+            border-color: #e31e24;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-align: left;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card.selected {
+            border-color: #e31e24;
+            background: rgba(227, 30, 36, 0.05);
+            box-shadow: 0 4px 20px rgba(227, 30, 36, 0.2);
+        }
+
+        .product-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #e31e24;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            object-fit: contain;
+            align-self: flex-start;
+            display: block;
+        }
+
+        .product-image-placeholder {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e31e24, #c41e24);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 2rem;
+            font-family: 'Playfair Display', serif;
+            box-shadow: 0 2px 8px rgba(227, 30, 36, 0.2);
+        }
+
+        .product-card[data-product-id="1"] .product-image-placeholder,
+        .product-card[data-product-id="2"] .product-image-placeholder,
+        .product-card[data-product-id="3"] .product-image-placeholder,
+        .product-card[data-product-id="4"] .product-image-placeholder,
+        .product-card[data-product-id="5"] .product-image-placeholder,
+        .product-card[data-product-id="6"] .product-image-placeholder,
+        .product-card[data-product-id="7"] .product-image-placeholder,
+        .product-card[data-product-id="8"] .product-image-placeholder {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+        }
+
+        .product-brand {
+            font-size: 0.9rem;
+            color: #e31e24;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c2c2c;
+            margin-bottom: 8px;
+        }
+
+        .product-category {
+            font-size: 0.85rem;
+            color: #666666;
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        .product-description {
+            font-size: 0.9rem;
+            color: #555555;
+            line-height: 1.4;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .product-card.show-description .product-description {
+            max-height: 200px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .description-toggle {
+            background: none;
+            border: none;
+            color: #e31e24;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin: 8px 0;
+            text-decoration: underline;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .buy-btn {
+            background: #e31e24;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: 'Source Sans Pro', sans-serif;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .buy-btn:hover {
+            background: #c41e24;
+            color: white;
+            text-decoration: none;
+        }
+
+        .show-more-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: #e31e24;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .show-more-btn:hover {
+            background: #c41e24;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(227, 30, 36, 0.3);
+        }
+
+        .chat-section {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            min-height: 600px;
+            max-height: 80vh;
+        }
+
+        .selected-products {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .selected-products h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c2c2c;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .selected-list {
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .selected-item-name {
+            font-size: 0.9rem;
+            color: #2c2c2c;
+        }
+
+        .remove-item {
+            background: #e31e24;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .generate-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: #e31e24;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .generate-btn:hover {
+            background: #c41e24;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(227, 30, 36, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-btn {
+            padding: 12px 16px;
+            background: #666666;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .clear-btn:hover {
+            background: #555555;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 20px 24px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .message.user .message-content {
+            background: #2c2c2c;
+            color: white;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 2px 8px rgba(44, 44, 44, 0.15);
+        }
+
+        .message.assistant .message-content {
+            background: #ffffff;
+            color: #2c2c2c;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .message.assistant .message-content h3 {
+            color: #e31e24;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .message.assistant .message-content h4 {
+            color: #2c2c2c;
+            font-weight: 600;
+            margin: 16px 0 8px 0;
+            font-size: 1rem;
+        }
+
+        .message.assistant .message-content ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .message.assistant .message-content li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .message.assistant .message-content strong {
+            color: #e31e24;
+            font-weight: 600;
+        }
+
+        .message.assistant .message-content em {
+            background: rgba(227, 30, 36, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-style: normal;
+            color: #e31e24;
+            font-weight: 500;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 18px 24px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: #ccc;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .chat-input:focus {
+            border-color: #e31e24;
+        }
+
+        .send-btn {
+            padding: 12px 20px;
+            background: #e31e24;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .send-btn:hover {
+            background: #c41e24;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            font-size: 0.85rem;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .footer-links a {
+            color: #666666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #e31e24;
+        }
+
+        @media (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-container {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">L'ORÉAL</div>
+        <div class="tagline">Routine Builder</div>
+    </header>
+
+    <div class="main-container">
+        <div class="products-section">
+            <div class="controls">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search products..." id="productSearch">
+                </div>
+                <select class="category-filter" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="skincare">Skincare</option>
+                    <option value="makeup">Makeup</option>
+                    <option value="haircare">Hair Care</option>
+                    <option value="fragrance">Fragrance</option>
+                </select>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded here -->
+            </div>
+
+            <button class="show-more-btn" id="showMoreBtn" style="display: none;">Show More Products</button>
+        </div>
+
+        <div class="chat-section">
+            <div class="selected-products">
+                <h3>Selected Products</h3>
+                <div class="selected-list" id="selectedList">
+                    <p style="color: #666; font-style: italic;">No products selected yet</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="generate-btn" id="generateBtn" disabled>Generate Routine</button>
+                    <button class="clear-btn" id="clearBtn">Clear All</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    <div class="message-content">
+                        Welcome to L'Oréal's Routine Builder! 🌟 Select products from the left to build your personalized routine, then click "Generate Routine" to get AI-powered recommendations. You can also ask me questions about skincare, makeup, and beauty routines anytime!
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form class="chat-input-form" id="chatForm">
+                    <textarea class="chat-input" id="chatInput" placeholder="Ask about your routine..." rows="1"></textarea>
+                    <button type="submit" class="send-btn" id="sendBtn">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">© 2025 L'Oréal. All rights reserved.</div>
+        <div class="footer-links">
+            <a href="#" onclick="return false;">Privacy Policy</a>
+            <a href="#" onclick="return false;">Terms of Use</a>
+            <a href="#" onclick="return false;">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        // Complete product data - all 36 products
+        const PRODUCTS_DATA = [
+            {
+                id: 1,
+                brand: "CeraVe",
+                name: "Foaming Facial Cleanser",
+                category: "skincare",
+                price: "$12.99",
+                image: "cerave-foaming-cleanser.jpg",
+                description: "A gentle foaming cleanser that removes dirt, oil and makeup without disrupting the skin barrier. Contains ceramides and hyaluronic acid for healthy skin.",
+                purchaseLink: "https://www.cerave.com/skincare/cleansers/foaming-facial-cleanser"
+            },
+            {
+                id: 2,
+                brand: "CeraVe", 
+                name: "Hydrating Facial Cleanser",
+                category: "skincare",
+                price: "$14.99",
+                image: "cerave-hydrating-cleanser.jpg",
+                description: "A non-foaming cleanser for normal to dry skin that cleanses while maintaining the skin's natural barrier. Enriched with ceramides and hyaluronic acid.",
+                purchaseLink: "https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser"
+            },
+            {
+                id: 3,
+                brand: "CeraVe",
+                name: "Moisturizing Cream", 
+                category: "skincare",
+                price: "$16.99",
+                image: "cerave-moisturizing-cream.jpg",
+                description: "A rich, non-greasy cream that provides 24-hour hydration. Perfect for dry to very dry skin on face and body. Contains ceramides and MVE technology.",
+                purchaseLink: "https://www.cerave.com/skincare/moisturizers/moisturizing-cream"
+            },
+            {
+                id: 4,
+                brand: "CeraVe",
+                name: "AM Facial Moisturizing Lotion SPF 30",
+                category: "skincare",
+                price: "$18.99",
+                image: "cerave-am-moisturizer.jpg",
+                description: "A lightweight morning moisturizer with broad spectrum SPF 30 protection. Contains ceramides and niacinamide for healthy-looking skin.",
+                purchaseLink: "https://www.cerave.com/skincare/moisturizers/am-facial-moisturizing-lotion-with-sunscreen"
+            },
+            {
+                id: 5,
+                brand: "CeraVe",
+                name: "PM Facial Moisturizing Lotion",
+                category: "skincare",
+                price: "$15.99",
+                image: "cerave-pm-moisturizer.jpg",
+                description: "A nighttime moisturizer that helps restore the skin barrier while you sleep. Contains ceramides and niacinamide for smooth, healthy skin.",
+                purchaseLink: "https://www.cerave.com/skincare/moisturizers/pm-facial-moisturizing-lotion"
+            },
+            {
+                id: 6,
+                brand: "CeraVe",
+                name: "Resurfacing Retinol Serum",
+                category: "skincare",
+                price: "$21.99",
+                image: "cerave-retinol-serum.jpg",
+                description: "An anti-aging serum with encapsulated retinol that helps reduce fine lines and improve skin texture. Contains ceramides and vitamin B3.",
+                purchaseLink: "https://www.cerave.com/skincare/serums/resurfacing-retinol-serum"
+            },
+            {
+                id: 7,
+                brand: "CeraVe",
+                name: "Vitamin C Serum",
+                category: "skincare",
+                price: "$19.99",
+                image: "cerave-vitamin-c-serum.jpg",
+                description: "A brightening serum with 10% pure vitamin C, vitamin B5, and hyaluronic acid to brighten skin and reduce dark spots.",
+                purchaseLink: "https://www.cerave.com/skincare/serums/vitamin-c-serum"
+            },
+            {
+                id: 8,
+                brand: "CeraVe",
+                name: "Eye Repair Cream",
+                category: "skincare",
+                price: "$17.99",
+                image: "cerave-eye-cream.jpg",
+                description: "A gentle eye cream that helps restore the delicate skin around the eyes. Contains ceramides and marine and botanical complex.",
+                purchaseLink: "https://www.cerave.com/skincare/moisturizers/eye-repair-cream"
+            },
+            {
+                id: 9,
+                brand: "L'Oréal Paris",
+                name: "Revitalift Anti-Wrinkle Cream",
+                category: "skincare",
+                price: "$24.99",
+                image: "loreal-revitalift-cream.jpg",
+                description: "A powerful anti-aging moisturizer with Pro-Retinol and Centella Asiatica that reduces wrinkles and firms skin.",
+                purchaseLink: "https://www.lorealparisusa.com/products/skin-care/products/face-moisturizer/revitalift-anti-wrinkle-firming-face-neck-cream"
+            },
+            {
+                id: 10,
+                brand: "L'Oréal Paris",
+                name: "Age Perfect Rosy Tone Moisturizer",
+                category: "skincare",
+                price: "$19.99",
+                image: "loreal-age-perfect-rosy.jpg",
+                description: "A moisturizer that neutralizes dullness and boosts rosy tone for mature skin. Contains Imperial Peony extract.",
+                purchaseLink: "https://www.lorealparisusa.com/products/skin-care/products/face-moisturizer/age-perfect-rosy-tone-moisturizer"
+            },
+            {
+                id: 11,
+                brand: "L'Oréal Paris",
+                name: "Pure-Clay Detox Mask",
+                category: "skincare",
+                price: "$7.99",
+                image: "loreal-clay-mask.jpg",
+                description: "A purifying face mask with 3 pure clays and charcoal that draws out dirt and toxins for clearer skin.",
+                purchaseLink: "https://www.lorealparisusa.com/products/skin-care/products/face-mask/pure-clay-detox-brighten-face-mask"
+            },
+            {
+                id: 12,
+                brand: "L'Oréal Paris",
+                name: "Hyaluronic Acid Serum",
+                category: "skincare",
+                price: "$29.99",
+                image: "loreal-hyaluronic-serum.jpg",
+                description: "A hydrating serum with 1.5% pure hyaluronic acid that plumps skin and reduces fine lines.",
+                purchaseLink: "https://www.lorealparisusa.com/products/skin-care/products/face-serum/revitalift-derm-intensives-1-5-percent-pure-hyaluronic-acid-serum"
+            },
+            {
+                id: 13,
+                brand: "L'Oréal Paris",
+                name: "Vitamin C Brightening Serum",
+                category: "skincare",
+                price: "$32.99",
+                image: "loreal-vitamin-c-serum.jpg",
+                description: "A potent vitamin C serum with 10% pure vitamin C that brightens skin and evens tone.",
+                purchaseLink: "https://www.lorealparisusa.com/products/skin-care/products/face-serum/revitalift-derm-intensives-vitamin-c-serum"
+            },
+            {
+                id: 14,
+                brand: "L'Oréal Paris",
+                name: "Gentle Sulfate-Free Cleanser",
+                category: "skincare",
+                price: "$8.99",
+                image: "loreal-gentle-cleanser.jpg",
+                description: "A gentle, sulfate-free cleanser that removes makeup and impurities while maintaining skin's natural moisture barrier.",
+                purchaseLink: "https://www.lorealparisusa.com/products/skin-care/products/cleanser/age-perfect-gentle-daily-cream-cleanser"
+            },
+            {
+                id: 15,
+                brand: "L'Oréal Paris",
+                name: "True Match Foundation",
+                category: "makeup", 
+                price: "$10.95",
+                image: "loreal-true-match-foundation.jpg",
+                description: "A liquid foundation that matches your skin's undertone for a natural, seamless finish. Available in 45 shades with buildable coverage.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/face/foundation/true-match-super-blendable-foundation"
+            },
+            {
+                id: 16,
+                brand: "L'Oréal Paris",
+                name: "Voluminous Lash Paradise Mascara",
+                category: "makeup",
+                price: "$8.95", 
+                image: "loreal-lash-paradise-mascara.jpg",
+                description: "A volumizing mascara that delivers intense volume and length. Features a soft wavy brush for feathery, full lashes without clumps.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/eye/mascara/voluminous-lash-paradise-mascara"
+            },
+            {
+                id: 17,
+                brand: "L'Oréal Paris",
+                name: "Rouge Signature Liquid Lipstick",
+                category: "makeup",
+                price: "$9.99",
+                image: "loreal-rouge-signature-lipstick.jpg",
+                description: "A lightweight liquid lipstick that delivers high color impact with a weightless naked-lip feel. Long-lasting and comfortable.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/lips/lipstick/rouge-signature-matte-liquid-lipstick"
+            },
+            {
+                id: 18,
+                brand: "L'Oréal Paris",
+                name: "Age Perfect Concealer",
+                category: "makeup",
+                price: "$12.95",
+                image: "loreal-age-perfect-concealer.jpg",
+                description: "A radiant concealer that instantly diminishes dark circles and imperfections while hydrating mature skin.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/face/concealer/age-perfect-radiant-concealer"
+            },
+            {
+                id: 19,
+                brand: "L'Oréal Paris",
+                name: "Brow Stylist Pencil",
+                category: "makeup",
+                price: "$8.99",
+                image: "loreal-brow-stylist-pencil.jpg",
+                description: "A precise eyebrow pencil that shapes, defines, and fills brows for a natural look. Includes spoolie brush.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/eye/eyebrow/brow-stylist-definer-waterproof-eyebrow-mechanical-pencil"
+            },
+            {
+                id: 20,
+                brand: "L'Oréal Paris",
+                name: "True Match Blush",
+                category: "makeup",
+                price: "$9.95",
+                image: "loreal-true-match-blush.jpg",
+                description: "A perfectly coordinated blush that matches your True Match foundation for a natural, healthy glow.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/face/blush/true-match-blush"
+            },
+            {
+                id: 21,
+                brand: "L'Oréal Paris",
+                name: "Colour Riche Lipstick",
+                category: "makeup",
+                price: "$8.99",
+                image: "loreal-colour-riche-lipstick.jpg",
+                description: "A luxurious lipstick with rich, creamy color and a comfortable feel. Available in over 30 shades.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/lips/lipstick/colour-riche-original-creamy-lipstick"
+            },
+            {
+                id: 22,
+                brand: "L'Oréal Paris",
+                name: "Infallible Setting Powder",
+                category: "makeup",
+                price: "$12.99",
+                image: "loreal-setting-powder.jpg",
+                description: "A lightweight setting powder that locks makeup in place for up to 16 hours of fresh, flawless wear.",
+                purchaseLink: "https://www.lorealparisusa.com/products/makeup/face/powder/infallible-tinted-loose-setting-powder"
+            },
+            {
+                id: 23,
+                brand: "Maybelline",
+                name: "Fit Me Foundation",
+                category: "makeup",
+                price: "$7.99",
+                image: "maybelline-fit-me-foundation.jpg",
+                description: "A lightweight foundation that matches your skin tone and texture. Oil-free and non-comedogenic.",
+                purchaseLink: "https://www.maybelline.com/face-makeup/foundation/fit-me-matte-poreless-liquid-foundation"
+            },
+            {
+                id: 24,
+                brand: "Maybelline",
+                name: "Great Lash Mascara",
+                category: "makeup",
+                price: "$5.99",
+                image: "maybelline-great-lash-mascara.jpg",
+                description: "America's favorite mascara that builds lashes to twice their natural thickness without clumping.",
+                purchaseLink: "https://www.maybelline.com/eye-makeup/mascara/great-lash-washable-mascara"
+            },
+            {
+                id: 25,
+                brand: "Maybelline",
+                name: "SuperStay Lipstick",
+                category: "makeup",
+                price: "$9.99",
+                image: "maybelline-superstay-lipstick.jpg",
+                description: "A long-wearing liquid lipstick that delivers bold color for up to 16 hours. Transfer-resistant formula.",
+                purchaseLink: "https://www.maybelline.com/lip-makeup/lip-color/superstay-matte-ink-liquid-lipstick"
+            },
+            {
+                id: 26,
+                brand: "Maybelline",
+                name: "Instant Age Rewind Concealer",
+                category: "makeup",
+                price: "$8.99",
+                image: "maybelline-age-rewind-concealer.jpg",
+                description: "A micro-corrector concealer that instantly erases dark circles and covers imperfections with buildable coverage.",
+                purchaseLink: "https://www.maybelline.com/face-makeup/concealer/instant-age-rewind-eraser-dark-circles-concealer"
+            },
+            {
+                id: 27,
+                brand: "Maybelline",
+                name: "Expert Wear Eyeshadow",
+                category: "makeup",
+                price: "$4.99",
+                image: "maybelline-eyeshadow.jpg",
+                description: "Professional-quality eyeshadow with smooth, blendable color. Available in coordinated quads for easy application.",
+                purchaseLink: "https://www.maybelline.com/eye-makeup/eyeshadow/expert-wear-eyeshadow-quads"
+            },
+            {
+                id: 28,
+                brand: "Maybelline",
+                name: "Define-A-Brow Pencil",
+                category: "makeup",
+                price: "$6.99",
+                image: "maybelline-brow-pencil.jpg",
+                description: "An easy-to-use eyebrow pencil that defines and shapes brows with natural-looking color.",
+                purchaseLink: "https://www.maybelline.com/eye-makeup/eyebrow-makeup/expert-wear-twin-brow-and-eye-pencils"
+            },
+            {
+                id: 29,
+                brand: "L'Oréal Paris",
+                name: "Elvive Total Repair 5 Shampoo",
+                category: "haircare",
+                price: "$6.49",
+                image: "loreal-elvive-shampoo.jpg", 
+                description: "A repairing shampoo that targets 5 signs of damaged hair: split ends, weakness, roughness, dullness, and dehydration.",
+                purchaseLink: "https://www.lorealparisusa.com/products/hair/hair-care/shampoo/elvive-total-repair-5-repairing-shampoo"
+            },
+            {
+                id: 30,
+                brand: "L'Oréal Paris",
+                name: "Elvive Total Repair 5 Conditioner",
+                category: "haircare",
+                price: "$6.49",
+                image: "loreal-elvive-conditioner.jpg",
+                description: "A nourishing conditioner that helps repair and strengthen damaged hair while providing smooth, manageable results.",
+                purchaseLink: "https://www.lorealparisusa.com/products/hair/hair-care/conditioner/elvive-total-repair-5-repairing-conditioner"
+            },
+            {
+                id: 31,
+                brand: "L'Oréal Paris",
+                name: "Elvive Dream Lengths Shampoo",
+                category: "haircare",
+                price: "$6.99",
+                image: "loreal-dream-lengths-shampoo.jpg",
+                description: "A length-caring shampoo that helps reinforce long hair and reduces breakage to help achieve your dream lengths.",
+                purchaseLink: "https://www.lorealparisusa.com/products/hair/hair-care/shampoo/elvive-dream-lengths-restoring-shampoo"
+            },
+            {
+                id: 32,
+                brand: "L'Oréal Paris",
+                name: "Advanced Hairstyle Heat Protectant",
+                category: "haircare",
+                price: "$4.99",
+                image: "loreal-heat-protectant.jpg",
+                description: "A heat protecting spray that shields hair from heat damage up to 450°F while adding shine and smoothness.",
+                purchaseLink: "https://www.lorealparisusa.com/products/hair/hair-styling/heat-protectant/advanced-hairstyle-sleek-it-iron-straight-heatspray"
+            },
+            {
+                id: 33,
+                brand: "L'Oréal Paris",
+                name: "EverPure Sulfate-Free Shampoo",
+                category: "haircare",
+                price: "$8.99",
+                image: "loreal-everpure-shampoo.jpg",
+                description: "A gentle, sulfate-free shampoo that cleanses and protects color-treated hair while maintaining vibrancy.",
+                purchaseLink: "https://www.lorealparisusa.com/products/hair/hair-care/shampoo/everpure-sulfate-free-moisture-shampoo"
+            },
+            {
+                id: 34,
+                brand: "L'Oréal Paris",
+                name: "Extraordinary Oil Treatment",
+                category: "haircare",
+                price: "$7.99",
+                image: "loreal-hair-oil.jpg",
+                description: "A lightweight hair oil treatment that nourishes and adds shine without weighing hair down. Perfect for all hair types.",
+                purchaseLink: "https://www.lorealparisusa.com/products/hair/hair-care/hair-treatment/elvive-extraordinary-oil-treatment"
+            },
+            {
+                id: 35,
+                brand: "L'Oréal Paris",
+                name: "Paris Amour Eau de Parfum",
+                category: "fragrance",
+                price: "$29.99",
+                image: "loreal-paris-amour-perfume.jpg",
+                description: "A romantic fragrance with notes of jasmine, rose, and vanilla. Perfect for everyday wear or special occasions.",
+                purchaseLink: "https://www.lorealparisusa.com/products/fragrance/paris-amour-eau-de-parfum"
+            },
+            {
+                id: 36,
+                brand: "L'Oréal Paris",
+                name: "Paris Sunset Eau de Toilette",
+                category: "fragrance",
+                price: "$24.99",
+                image: "loreal-paris-sunset-perfume.jpg",
+                description: "A fresh, floral fragrance with citrus top notes and a warm, sensual base. Light and refreshing for daily use.",
+                purchaseLink: "https://www.lorealparisusa.com/products/fragrance/paris-sunset-eau-de-toilette"
+            }
+        ];
+
+        // Simple routine builder class
+        class RoutineBuilder {
+            constructor() {
+                this.selectedProducts = new Set();
+                this.displayedProducts = 6;
+                this.init();
+            }
+
+            init() {
+                this.loadSavedSelections();
+                this.renderProducts();
+                this.setupEventListeners();
+                this.updateSelectedProductsUI();
+            }
+
+            renderProducts() {
+                const grid = document.getElementById('productsGrid');
+                const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+                const categoryFilter = document.getElementById('categoryFilter').value;
+
+                let filteredProducts = PRODUCTS_DATA.filter(product => {
+                    const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                        product.brand.toLowerCase().includes(searchTerm);
+                    const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                    return matchesSearch && matchesCategory;
+                });
+
+                const productsToShow = filteredProducts.slice(0, this.displayedProducts);
+                
+                grid.innerHTML = productsToShow.map(product => `
+                    <div class="product-card ${this.selectedProducts.has(product.id) ? 'selected' : ''}" 
+                         data-product-id="${product.id}">
+                        <img src="${product.image}" 
+                             alt="${product.name}" 
+                             class="product-image" 
+                             onload="this.style.display='block'; this.nextElementSibling.style.display='none';"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="product-image-placeholder"></div>
+                        <div class="product-brand">${product.brand}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-category">${product.category}</div>
+                        <button class="description-toggle">Show details</button>
+                        <div class="product-description">
+                            ${product.description}
+                            <br><br>
+                            <strong>Price: ${product.price}</strong>
+                            <br><br>
+                            <a href="${product.purchaseLink}" target="_blank" class="buy-btn">Buy Now</a>
+                        </div>
+                    </div>
+                `).join('');
+
+                const showMoreBtn = document.getElementById('showMoreBtn');
+                showMoreBtn.style.display = filteredProducts.length > this.displayedProducts ? 'block' : 'none';
+
+                this.addProductEventListeners();
+            }
+
+            addProductEventListeners() {
+                const grid = document.getElementById('productsGrid');
+                
+                grid.querySelectorAll('.product-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('description-toggle') && 
+                            !e.target.classList.contains('buy-btn') &&
+                            e.target.tagName !== 'A') {
+                            this.toggleProductSelection(parseInt(card.dataset.productId));
+                        }
+                    });
+                });
+
+                grid.querySelectorAll('.description-toggle').forEach(toggle => {
+                    toggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const card = e.target.closest('.product-card');
+                        card.classList.toggle('show-description');
+                        e.target.textContent = card.classList.contains('show-description') ? 'Hide details' : 'Show details';
+                    });
+                });
+            }
+
+            setupEventListeners() {
+                document.getElementById('productSearch').addEventListener('input', () => {
+                    this.filterProducts();
+                });
+
+                document.getElementById('categoryFilter').addEventListener('change', () => {
+                    this.filterProducts();
+                });
+
+                document.getElementById('generateBtn').addEventListener('click', () => {
+                    this.generateRoutine();
+                });
+
+                document.getElementById('clearBtn').addEventListener('click', () => {
+                    this.clearAllSelections();
+                });
+
+                document.getElementById('showMoreBtn').addEventListener('click', () => {
+                    this.showMoreProducts();
+                });
+
+                document.getElementById('chatForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.sendMessage();
+                });
+            }
+
+            toggleProductSelection(productId) {
+                if (this.selectedProducts.has(productId)) {
+                    this.selectedProducts.delete(productId);
+                } else {
+                    this.selectedProducts.add(productId);
+                }
+                
+                this.saveSelections();
+                this.updateSelectedProductsUI();
+                this.renderProducts();
+            }
+
+            updateSelectedProductsUI() {
+                const selectedList = document.getElementById('selectedList');
+                const generateBtn = document.getElementById('generateBtn');
+
+                if (this.selectedProducts.size === 0) {
+                    selectedList.innerHTML = '<p style="color: #666; font-style: italic;">No products selected yet</p>';
+                    generateBtn.disabled = true;
+                } else {
+                    const selectedProductsData = Array.from(this.selectedProducts).map(id => 
+                        PRODUCTS_DATA.find(p => p.id === id)
+                    );
+
+                    selectedList.innerHTML = selectedProductsData.map(product => `
+                        <div class="selected-item">
+                            <span class="selected-item-name">${product.brand} ${product.name}</span>
+                            <button class="remove-item" data-product-id="${product.id}">×</button>
+                        </div>
+                    `).join('');
+
+                    selectedList.querySelectorAll('.remove-item').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.toggleProductSelection(parseInt(btn.dataset.productId));
+                        });
+                    });
+
+                    generateBtn.disabled = false;
+                }
+            }
+
+            filterProducts() {
+                this.displayedProducts = 6;
+                this.renderProducts();
+            }
+
+            showMoreProducts() {
+                this.displayedProducts += 6;
+                this.renderProducts();
+            }
+
+            clearAllSelections() {
+                this.selectedProducts.clear();
+                this.saveSelections();
+                this.updateSelectedProductsUI();
+                this.renderProducts();
+            }
+
+            saveSelections() {
+                localStorage.setItem('lorealSelectedProducts', JSON.stringify(Array.from(this.selectedProducts)));
+            }
+
+            loadSavedSelections() {
+                const saved = localStorage.getItem('lorealSelectedProducts');
+                if (saved) {
+                    this.selectedProducts = new Set(JSON.parse(saved));
+                }
+            }
+
+            generateRoutine() {
+                if (this.selectedProducts.size === 0) return;
+
+                const selectedProductsData = Array.from(this.selectedProducts).map(id => 
+                    PRODUCTS_DATA.find(p => p.id === id)
+                );
+
+                this.showTypingIndicator();
+
+                // Create comprehensive routine based on selected products
+                let routineMessage = "✨ **Your Personalized L'Oréal Routine** ✨\n\n";
+
+                const skincare = selectedProductsData.filter(p => p.category === 'skincare');
+                const makeup = selectedProductsData.filter(p => p.category === 'makeup');
+                const haircare = selectedProductsData.filter(p => p.category === 'haircare');
+                const fragrance = selectedProductsData.filter(p => p.category === 'fragrance');
+
+                if (skincare.length > 0) {
+                    routineMessage += "🌅 **Morning Skincare Routine:**\n";
+                    skincare.forEach((product, index) => {
+                        routineMessage += `${index + 1}. **${product.brand} ${product.name}** - ${this.getUsageTip(product)}\n`;
+                    });
+                    routineMessage += "\n";
+                }
+
+                if (makeup.length > 0) {
+                    routineMessage += "💄 **Makeup Application:**\n";
+                    makeup.forEach((product, index) => {
+                        routineMessage += `${index + 1}. **${product.brand} ${product.name}** - ${this.getUsageTip(product)}\n`;
+                    });
+                    routineMessage += "\n";
+                }
+
+                if (haircare.length > 0) {
+                    routineMessage += "💇‍♀️ **Hair Care Routine:**\n";
+                    haircare.forEach((product, index) => {
+                        routineMessage += `${index + 1}. **${product.brand} ${product.name}** - ${this.getUsageTip(product)}\n`;
+                    });
+                    routineMessage += "\n";
+                }
+
+                if (fragrance.length > 0) {
+                    routineMessage += "🌸 **Finishing Touch:**\n";
+                    fragrance.forEach((product, index) => {
+                        routineMessage += `${index + 1}. **${product.brand} ${product.name}** - ${this.getUsageTip(product)}\n`;
+                    });
+                    routineMessage += "\n";
+                }
+
+                routineMessage += "💡 **Pro Tips:**\n";
+                routineMessage += "• Always patch test new products\n";
+                routineMessage += "• Apply skincare from thinnest to thickest consistency\n";
+                routineMessage += "• Wait 30 seconds between each skincare step\n";
+                routineMessage += "• Don't forget sunscreen during the day!\n\n";
+                routineMessage += "Feel free to ask me about application techniques or product recommendations! 💫";
+
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    this.addMessage(routineMessage, 'assistant');
+                }, 2000);
+            }
+
+            getUsageTip(product) {
+                const tips = {
+                    'cleanser': 'Use morning and evening on damp skin, massage gently, then rinse',
+                    'moisturizer': 'Apply to clean skin in upward motions',
+                    'serum': 'Apply 2-3 drops to clean skin before moisturizer',
+                    'foundation': 'Apply with brush or beauty sponge for even coverage',
+                    'mascara': 'Wiggle brush from roots to tips for volume',
+                    'lipstick': 'Apply from center of lips outward',
+                    'shampoo': 'Massage into wet scalp, focus on roots',
+                    'conditioner': 'Apply to mid-lengths and ends, avoid roots',
+                    'perfume': 'Spray on pulse points for best projection'
+                };
+
+                const name = product.name.toLowerCase();
+                if (name.includes('cleanser')) return tips.cleanser;
+                if (name.includes('moisturizer') || name.includes('cream')) return tips.moisturizer;
+                if (name.includes('serum')) return tips.serum;
+                if (name.includes('foundation')) return tips.foundation;
+                if (name.includes('mascara')) return tips.mascara;
+                if (name.includes('lipstick') || name.includes('lip')) return tips.lipstick;
+                if (name.includes('shampoo')) return tips.shampoo;
+                if (name.includes('conditioner')) return tips.conditioner;
+                if (name.includes('parfum') || name.includes('toilette')) return tips.perfume;
+                return 'Follow product instructions for best results';
+            }
+
+            sendMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+
+                this.addMessage(message, 'user');
+                input.value = '';
+
+                this.showTypingIndicator();
+
+                // Process the message for different types of requests
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    
+                    const response = this.processUserMessage(message);
+                    this.addMessage(response, 'assistant');
+                }, 1500);
+            }
+
+            processUserMessage(message) {
+                const msg = message.toLowerCase();
+
+                // Skin type routine requests
+                if (msg.includes('dry skin') || msg.includes('routine for dry')) {
+                    return this.createSkinTypeRoutine('dry');
+                }
+                if (msg.includes('oily skin') || msg.includes('routine for oily')) {
+                    return this.createSkinTypeRoutine('oily');
+                }
+                if (msg.includes('sensitive skin') || msg.includes('routine for sensitive')) {
+                    return this.createSkinTypeRoutine('sensitive');
+                }
+                if (msg.includes('combination skin') || msg.includes('routine for combination')) {
+                    return this.createSkinTypeRoutine('combination');
+                }
+                if (msg.includes('mature skin') || msg.includes('anti-aging') || msg.includes('wrinkles')) {
+                    return this.createSkinTypeRoutine('mature');
+                }
+
+                // General routine requests
+                if (msg.includes('create routine') || msg.includes('build routine') || msg.includes('skincare routine')) {
+                    return "I'd love to help you create a routine! What's your skin type? (dry, oily, combination, sensitive, or mature) I can recommend the perfect L'Oréal products for your needs! ✨";
+                }
+
+                // Product-specific questions
+                if (msg.includes('how to use') || msg.includes('application')) {
+                    return "Great question! For specific application tips:\n\n• **Cleansers**: Use on damp skin, massage gently, rinse thoroughly\n• **Serums**: Apply 2-3 drops before moisturizer\n• **Moisturizers**: Use upward motions, don't forget neck\n• **Foundation**: Blend with brush or sponge for even coverage\n• **Mascara**: Start at roots, wiggle brush upward\n\nWhich specific product would you like tips for? 💄";
+                }
+
+                // General beauty advice
+                if (msg.includes('morning routine')) {
+                    return "✨ **Perfect Morning Routine:** ✨\n\n1. **Cleanser** - Start fresh\n2. **Serum** - Target specific concerns\n3. **Moisturizer with SPF** - Hydrate and protect\n4. **Makeup** - Enhance your natural beauty\n\nWould you like me to recommend specific L'Oréal products for your skin type?";
+                }
+
+                if (msg.includes('evening routine') || msg.includes('night routine')) {
+                    return "🌙 **Perfect Evening Routine:** 🌙\n\n1. **Makeup Remover** - Remove the day\n2. **Cleanser** - Deep clean\n3. **Treatment Serum** - Repair and renew\n4. **Night Moisturizer** - Hydrate overnight\n\nEvening is perfect for active ingredients like retinol! What's your main skin concern?";
+                }
+
+                // Default helpful response
+                return "Thank you for your question! I'm here to help with L'Oréal products and beauty routines. I can:\n\n✨ Create routines for different skin types (dry, oily, sensitive, etc.)\n💄 Recommend products based on your concerns\n🌟 Provide application tips and techniques\n\nWhat would you like to know about? Feel free to ask about specific skin types or products!";
+            }
+
+            createSkinTypeRoutine(skinType) {
+                const routines = {
+                    dry: {
+                        title: "💧 **Perfect Routine for Dry Skin** 💧",
+                        products: [
+                            { name: "CeraVe Hydrating Facial Cleanser", reason: "Gentle, non-stripping formula" },
+                            { name: "L'Oréal Hyaluronic Acid Serum", reason: "Intense hydration boost" },
+                            { name: "CeraVe Moisturizing Cream", reason: "Rich, long-lasting moisture" },
+                            { name: "CeraVe AM Moisturizing Lotion SPF 30", reason: "Hydrating protection" }
+                        ],
+                        tips: "• Use lukewarm water, not hot\n• Apply moisturizer while skin is still damp\n• Consider a humidifier at night"
+                    },
+                    oily: {
+                        title: "✨ **Perfect Routine for Oily Skin** ✨",
+                        products: [
+                            { name: "CeraVe Foaming Facial Cleanser", reason: "Controls oil without over-drying" },
+                            { name: "L'Oréal Vitamin C Brightening Serum", reason: "Brightens and refines pores" },
+                            { name: "L'Oréal Pure-Clay Detox Mask", reason: "Weekly deep pore cleansing" },
+                            { name: "CeraVe PM Facial Moisturizing Lotion", reason: "Lightweight hydration" }
+                        ],
+                        tips: "• Don't skip moisturizer - your skin needs hydration!\n• Use the clay mask 1-2 times per week\n• Blot excess oil instead of washing too often"
+                    },
+                    sensitive: {
+                        title: "🌸 **Gentle Routine for Sensitive Skin** 🌸",
+                        products: [
+                            { name: "L'Oréal Gentle Sulfate-Free Cleanser", reason: "Extra gentle, no irritation" },
+                            { name: "CeraVe Moisturizing Cream", reason: "Fragrance-free, calming" },
+                            { name: "CeraVe Eye Repair Cream", reason: "Gentle care for delicate eye area" },
+                            { name: "CeraVe AM Moisturizing Lotion SPF 30", reason: "Gentle sun protection" }
+                        ],
+                        tips: "• Always patch test new products\n• Introduce one new product at a time\n• Avoid fragranced products"
+                    },
+                    combination: {
+                        title: "⚖️ **Balanced Routine for Combination Skin** ⚖️",
+                        products: [
+                            { name: "CeraVe Foaming Facial Cleanser", reason: "Balances oil in T-zone" },
+                            { name: "L'Oréal Hyaluronic Acid Serum", reason: "Hydrates dry areas" },
+                            { name: "CeraVe PM Facial Moisturizing Lotion", reason: "Light but nourishing" },
+                            { name: "L'Oréal Pure-Clay Detox Mask", reason: "Target T-zone weekly" }
+                        ],
+                        tips: "• Use different products on different face areas if needed\n• Focus clay mask on T-zone only\n• Don't neglect dry cheek areas"
+                    },
+                    mature: {
+                        title: "🌟 **Anti-Aging Routine for Mature Skin** 🌟",
+                        products: [
+                            { name: "L'Oréal Gentle Sulfate-Free Cleanser", reason: "Maintains moisture barrier" },
+                            { name: "CeraVe Resurfacing Retinol Serum", reason: "Reduces fine lines and wrinkles" },
+                            { name: "L'Oréal Revitalift Anti-Wrinkle Cream", reason: "Firms and plumps skin" },
+                            { name: "CeraVe Eye Repair Cream", reason: "Targets delicate eye area" }
+                        ],
+                        tips: "• Start retinol slowly - 2-3 times per week\n• Always use SPF during the day\n• Focus on hydration and gentle exfoliation"
+                    }
+                };
+
+                const routine = routines[skinType];
+                let response = routine.title + "\n\n";
+                
+                response += "**Recommended Products:**\n";
+                routine.products.forEach((product, index) => {
+                    response += `${index + 1}. **${product.name}** - ${product.reason}\n`;
+                });
+                
+                response += "\n**Pro Tips:**\n" + routine.tips;
+                response += "\n\nWould you like me to help you find these products or create a custom routine? Just click on any product to get started! 💫";
+                
+                return response;
+            }
+
+            // Enhanced product selection with recommendations
+            toggleProductSelection(productId) {
+                if (this.selectedProducts.has(productId)) {
+                    this.selectedProducts.delete(productId);
+                } else {
+                    this.selectedProducts.add(productId);
+                    // Show product-specific recommendations
+                    this.showProductRecommendations(productId);
+                }
+                
+                this.saveSelections();
+                this.updateSelectedProductsUI();
+                this.renderProducts();
+            }
+
+            showProductRecommendations(productId) {
+                const product = PRODUCTS_DATA.find(p => p.id === productId);
+                const recommendations = this.getProductRecommendations(product);
+                
+                this.showTypingIndicator();
+                
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    this.addMessage(recommendations, 'assistant');
+                }, 1000);
+            }
+
+            getProductRecommendations(product) {
+                let message = `Great choice! You selected **${product.brand} ${product.name}**. ✨\n\n`;
+                
+                // Get complementary products
+                const complementary = this.getComplementaryProducts(product);
+                
+                if (complementary.length > 0) {
+                    message += "**Perfect products to pair with this:**\n";
+                    complementary.forEach((comp, index) => {
+                        message += `${index + 1}. **${comp.brand} ${comp.name}** - ${comp.reason}\n`;
+                    });
+                    message += "\n";
+                }
+                
+                // Add usage tip
+                message += `**How to use:** ${this.getUsageTip(product)}\n\n`;
+                
+                // Add routine suggestion
+                message += this.getRoutineSuggestion(product);
+                
+                return message;
+            }
+
+            getComplementaryProducts(selectedProduct) {
+                const complementary = [];
+                
+                if (selectedProduct.category === 'skincare') {
+                    if (selectedProduct.name.toLowerCase().includes('cleanser')) {
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('Moisturizing Cream')),
+                            reason: "Follow cleansing with rich hydration"
+                        });
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('Hyaluronic Acid Serum')),
+                            reason: "Add a hydrating serum for extra moisture"
+                        });
+                    }
+                    if (selectedProduct.name.toLowerCase().includes('serum')) {
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('Gentle Sulfate-Free Cleanser')),
+                            reason: "Start with a gentle cleanser"
+                        });
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('AM Facial Moisturizing')),
+                            reason: "Seal in the serum with moisturizer + SPF"
+                        });
+                    }
+                }
+                
+                if (selectedProduct.category === 'makeup') {
+                    if (selectedProduct.name.toLowerCase().includes('foundation')) {
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('Age Perfect Concealer')),
+                            reason: "Perfect for spot coverage and under-eyes"
+                        });
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('Setting Powder')),
+                            reason: "Lock in your foundation for all-day wear"
+                        });
+                    }
+                    if (selectedProduct.name.toLowerCase().includes('mascara')) {
+                        complementary.push({
+                            ...PRODUCTS_DATA.find(p => p.name.includes('Brow Stylist')),
+                            reason: "Frame your eyes with defined brows"
+                        });
+                    }
+                }
+                
+                return complementary.filter(p => p && p.id).slice(0, 2); // Max 2 recommendations
+            }
+
+            getRoutineSuggestion(product) {
+                if (product.category === 'skincare') {
+                    return "💡 **Routine Tip:** This fits perfectly into both morning and evening routines. Would you like me to create a complete skincare routine for your skin type?";
+                }
+                if (product.category === 'makeup') {
+                    return "💄 **Routine Tip:** This works great as part of your daily makeup look. Want me to suggest a complete makeup routine?";
+                }
+                if (product.category === 'haircare') {
+                    return "💇‍♀️ **Routine Tip:** Use this as part of your weekly hair care routine. Looking for the complete hair care set?";
+                }
+                return "✨ **Routine Tip:** This product works beautifully on its own or as part of a complete routine!";
+            }
+
+            addMessage(content, sender) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = content;
+                
+                messageDiv.appendChild(messageContent);
+                messagesContainer.appendChild(messageDiv);
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            showTypingIndicator() {
+                document.getElementById('typingIndicator').style.display = 'block';
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            hideTypingIndicator() {
+                document.getElementById('typingIndicator').style.display = 'none';
+            }
+        }
+
+        // Initialize the routine builder
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                new RoutineBuilder();
+                console.log('Routine Builder loaded successfully!');
+            } catch (error) {
+                console.error('Error loading Routine Builder:', error);
+            }
+        });
+    </script>
+</body>
+</html>
